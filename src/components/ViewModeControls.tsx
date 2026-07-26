@@ -8,7 +8,7 @@ type ViewModeControlsProps = {
 
 export function ViewModeControls({ value, disabled, onChange }: ViewModeControlsProps) {
   return (
-    <div className="view-mode-controls" aria-label="Result view mode">
+    <div className="view-mode-controls" role="group" aria-label="Result view mode">
       <button
         type="button"
         aria-pressed={value === "list"}

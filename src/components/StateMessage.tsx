@@ -14,7 +14,11 @@ export function StateMessage({
   onAction
 }: StateMessageProps) {
   return (
-    <div className={`state-message state-message--${tone}`} role="status" aria-live="polite">
+    <div
+      className={`state-message state-message--${tone}`}
+      role={tone === "error" ? "alert" : "status"}
+      aria-live={tone === "error" ? "assertive" : "polite"}
+    >
       <h3>{title}</h3>
       <p>{message}</p>
       {actionLabel && onAction ? (

@@ -51,7 +51,11 @@ export function App() {
 
   return (
     <main className="app-shell">
-      <section className="app-region app-region--search" aria-labelledby="search-heading">
+      <section
+        className="app-region app-region--search"
+        aria-labelledby="search-heading"
+        aria-busy={search.isLoading}
+      >
         <h1 id="search-heading">Sound Search</h1>
         <SearchBar
           value={search.inputQuery}

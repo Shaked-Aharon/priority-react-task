@@ -6,7 +6,7 @@ type PlayerEmbedProps = {
 
 export function PlayerEmbed({ result }: PlayerEmbedProps) {
   return (
-    <div className="player-embed">
+    <div className="player-embed" aria-label="Selected track player">
       <iframe
         title={`Mixcloud player for ${result.title}`}
         src={result.embedUrl}

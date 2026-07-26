@@ -279,6 +279,7 @@ input:focus-visible {
   outline: none;
 }
 
+.image-preview:focus,
 .image-preview:focus-visible {
   box-shadow: 0 0 0 3px rgba(30, 92, 71, 0.25);
 }

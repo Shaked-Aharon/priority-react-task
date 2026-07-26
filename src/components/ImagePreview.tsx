@@ -11,7 +11,13 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(functi
   ref
 ) {
   return (
-    <div className="image-preview" ref={ref} tabIndex={-1} aria-live="polite">
+    <div
+      className="image-preview"
+      ref={ref}
+      tabIndex={-1}
+      aria-live="polite"
+      aria-label={result ? `Selected result: ${result.title} by ${result.artist}` : "No result selected"}
+    >
       {result ? (
         <button
           className="image-preview__button"

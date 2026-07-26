@@ -26,6 +26,8 @@ export function SearchResults({
   onRetry,
   onSelect
 }: SearchResultsProps) {
+  const label = activeQuery ? `Results for ${activeQuery}` : "Search results";
+
   if (status === "idle") {
     return (
       <StateMessage
@@ -59,7 +61,7 @@ export function SearchResults({
   const listClassName = viewMode === "tile" ? "result-grid" : "result-list";
 
   return (
-    <ul className={listClassName} aria-label={`Results for ${activeQuery}`}>
+    <ul className={listClassName} aria-label={label}>
       {results.map((result) => (
         <ResultComponent
           key={result.id}

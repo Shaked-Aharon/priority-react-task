@@ -5,7 +5,11 @@ type RecentSearchesProps = {
 
 export function RecentSearches({ searches, onSearch }: RecentSearchesProps) {
   if (searches.length === 0) {
-    return <p className="recent-searches__empty">No recent searches yet.</p>;
+    return (
+      <p className="recent-searches__empty" role="status">
+        No recent searches yet.
+      </p>
+    );
   }
 
   return (
