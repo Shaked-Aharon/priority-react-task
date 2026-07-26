@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { mixcloudProvider } from "../api/mixcloudProvider";
 import type { SoundSearchResult } from "../api/types";
 import { ImagePreview } from "../components/ImagePreview";
 import { PaginationControls } from "../components/PaginationControls";
+import { PlayerEmbed } from "../components/PlayerEmbed";
 import { RecentSearches } from "../components/RecentSearches";
 import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
@@ -14,6 +15,7 @@ export function App() {
   const search = useSearchController(mixcloudProvider);
   const { recentSearches, addSearch } = useRecentSearches();
   const previewRef = useRef<HTMLDivElement>(null);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   useEffect(() => {
     if (search.lastSuccessfulSearch) {
@@ -32,6 +34,10 @@ export function App() {
     },
     [search]
   );
+
+  useEffect(() => {
+    setIsPlayerOpen(false);
+  }, [search.selectedResult?.id]);
 
   return (
     <main className="app-shell">
@@ -63,7 +69,12 @@ export function App() {
 
       <section className="app-region app-region--preview" aria-labelledby="preview-heading">
         <h2 id="preview-heading">Image Preview</h2>
-        <ImagePreview ref={previewRef} result={search.selectedResult} />
+        <ImagePreview
+          ref={previewRef}
+          result={search.selectedResult}
+          onOpenPlayer={() => setIsPlayerOpen(true)}
+        />
+        {search.selectedResult && isPlayerOpen ? <PlayerEmbed result={search.selectedResult} /> : null}
       </section>
 
       <section className="app-region app-region--recent" aria-labelledby="recent-heading">
