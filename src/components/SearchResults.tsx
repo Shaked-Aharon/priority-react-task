@@ -10,7 +10,7 @@ type SearchResultsProps = {
   status: SearchStatus;
   errorMessage: string;
   onRetry: () => void;
-  onSelect: (result: SoundSearchResult) => void;
+  onSelect: (result: SoundSearchResult, element: HTMLElement) => void;
 };
 
 export function SearchResults({

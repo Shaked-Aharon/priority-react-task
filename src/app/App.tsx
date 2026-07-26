@@ -1,21 +1,37 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { mixcloudProvider } from "../api/mixcloudProvider";
+import type { SoundSearchResult } from "../api/types";
+import { ImagePreview } from "../components/ImagePreview";
 import { PaginationControls } from "../components/PaginationControls";
 import { RecentSearches } from "../components/RecentSearches";
 import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
 import { useRecentSearches } from "../hooks/useRecentSearches";
 import { useSearchController } from "../hooks/useSearchController";
+import { animateSelection } from "../lib/animation";
 
 export function App() {
   const search = useSearchController(mixcloudProvider);
   const { recentSearches, addSearch } = useRecentSearches();
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (search.lastSuccessfulSearch) {
       addSearch(search.lastSuccessfulSearch.term);
     }
   }, [addSearch, search.lastSuccessfulSearch]);
+
+  const handleSelectResult = useCallback(
+    (result: SoundSearchResult, sourceElement: HTMLElement) => {
+      search.selectResult(result);
+
+      if (previewRef.current) {
+        animateSelection(sourceElement, previewRef.current);
+        window.setTimeout(() => previewRef.current?.focus(), 0);
+      }
+    },
+    [search]
+  );
 
   return (
     <main className="app-shell">
@@ -34,7 +50,7 @@ export function App() {
           status={search.status}
           errorMessage={search.errorMessage}
           onRetry={search.retry}
-          onSelect={search.selectResult}
+          onSelect={handleSelectResult}
         />
         <PaginationControls
           canGoPrevious={search.canGoPrevious}
@@ -47,7 +63,7 @@ export function App() {
 
       <section className="app-region app-region--preview" aria-labelledby="preview-heading">
         <h2 id="preview-heading">Image Preview</h2>
-        <p>Select a result to preview its artwork.</p>
+        <ImagePreview ref={previewRef} result={search.selectedResult} />
       </section>
 
       <section className="app-region app-region--recent" aria-labelledby="recent-heading">

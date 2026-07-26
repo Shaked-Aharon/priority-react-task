@@ -3,7 +3,7 @@ import type { SoundSearchResult } from "../api/types";
 type ResultListItemProps = {
   result: SoundSearchResult;
   isSelected: boolean;
-  onSelect: (result: SoundSearchResult) => void;
+  onSelect: (result: SoundSearchResult, element: HTMLElement) => void;
 };
 
 export function ResultListItem({ result, isSelected, onSelect }: ResultListItemProps) {
@@ -13,7 +13,7 @@ export function ResultListItem({ result, isSelected, onSelect }: ResultListItemP
         className="result-card result-card--list"
         type="button"
         aria-pressed={isSelected}
-        onClick={() => onSelect(result)}
+        onClick={(event) => onSelect(result, event.currentTarget)}
       >
         <img src={result.imageUrl} alt="" loading="lazy" />
         <span className="result-card__text">
