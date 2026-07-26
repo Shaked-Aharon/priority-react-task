@@ -1,7 +1,9 @@
 import type { SoundSearchResult } from "../api/types";
 import type { SearchStatus } from "../hooks/useSearchController";
 import { ResultListItem } from "./ResultListItem";
+import { ResultTile } from "./ResultTile";
 import { StateMessage } from "./StateMessage";
+import type { ViewMode } from "./ViewModeControls";
 
 type SearchResultsProps = {
   activeQuery: string;
@@ -9,6 +11,7 @@ type SearchResultsProps = {
   selectedResult: SoundSearchResult | null;
   status: SearchStatus;
   errorMessage: string;
+  viewMode: ViewMode;
   onRetry: () => void;
   onSelect: (result: SoundSearchResult, element: HTMLElement) => void;
 };
@@ -19,6 +22,7 @@ export function SearchResults({
   selectedResult,
   status,
   errorMessage,
+  viewMode,
   onRetry,
   onSelect
 }: SearchResultsProps) {
@@ -51,10 +55,13 @@ export function SearchResults({
     return <StateMessage title="No results" message={`No cloudcasts matched "${activeQuery}".`} />;
   }
 
+  const ResultComponent = viewMode === "tile" ? ResultTile : ResultListItem;
+  const listClassName = viewMode === "tile" ? "result-grid" : "result-list";
+
   return (
-    <ul className="result-list" aria-label={`Results for ${activeQuery}`}>
+    <ul className={listClassName} aria-label={`Results for ${activeQuery}`}>
       {results.map((result) => (
-        <ResultListItem
+        <ResultComponent
           key={result.id}
           result={result}
           isSelected={selectedResult?.id === result.id}
