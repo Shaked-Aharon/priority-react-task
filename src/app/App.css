@@ -169,6 +169,27 @@ button:disabled {
   min-width: 7rem;
 }
 
+.recent-searches {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-searches button {
+  width: 100%;
+  overflow-wrap: anywhere;
+  border-color: #c9d7cf;
+  background: #eef5f1;
+  color: #1e5c47;
+  text-align: left;
+}
+
+.recent-searches__empty {
+  margin-top: 1rem;
+}
+
 @media (min-width: 900px) {
   .app-shell {
     grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr) minmax(220px, 0.55fr);

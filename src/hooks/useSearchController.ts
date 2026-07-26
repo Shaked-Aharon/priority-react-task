@@ -18,6 +18,11 @@ const PAGE_SIZE = 6;
 
 export type SearchStatus = "idle" | "loading" | "success" | "empty" | "error";
 
+export type SuccessfulSearchEvent = {
+  id: number;
+  term: string;
+};
+
 type SearchRequestKind = "first" | "next" | "previous";
 
 type RequestSnapshot = {
@@ -35,7 +40,7 @@ export function useSearchController(provider: SoundProvider) {
   const [status, setStatus] = useState<SearchStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [pagination, setPagination] = useState<PaginationState>(initialPaginationState);
-  const [lastSuccessfulSearchTerm, setLastSuccessfulSearchTerm] = useState<string | null>(null);
+  const [lastSuccessfulSearch, setLastSuccessfulSearch] = useState<SuccessfulSearchEvent | null>(null);
 
   const debouncedQuery = useDebouncedValue(inputQuery, SEARCH_DEBOUNCE_MS);
   const requestIdRef = useRef(0);
@@ -84,7 +89,10 @@ export function useSearchController(provider: SoundProvider) {
         failedRequestRef.current = null;
 
         if (snapshot.kind === "first") {
-          setLastSuccessfulSearchTerm(snapshot.query);
+          setLastSuccessfulSearch((currentEvent) => ({
+            id: (currentEvent?.id ?? 0) + 1,
+            term: snapshot.query
+          }));
         }
       } catch (error) {
         if (abortController.signal.aborted || requestId !== requestIdRef.current) {
@@ -199,7 +207,7 @@ export function useSearchController(provider: SoundProvider) {
     status,
     errorMessage,
     pagination,
-    lastSuccessfulSearchTerm,
+    lastSuccessfulSearch,
     isLoading: status === "loading",
     canGoPrevious: status !== "loading" && canGoPrevious(pagination),
     canGoNext: status !== "loading" && canGoNext(pagination),

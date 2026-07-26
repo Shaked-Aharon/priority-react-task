@@ -1,11 +1,21 @@
+import { useEffect } from "react";
 import { mixcloudProvider } from "../api/mixcloudProvider";
 import { PaginationControls } from "../components/PaginationControls";
+import { RecentSearches } from "../components/RecentSearches";
 import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
+import { useRecentSearches } from "../hooks/useRecentSearches";
 import { useSearchController } from "../hooks/useSearchController";
 
 export function App() {
   const search = useSearchController(mixcloudProvider);
+  const { recentSearches, addSearch } = useRecentSearches();
+
+  useEffect(() => {
+    if (search.lastSuccessfulSearch) {
+      addSearch(search.lastSuccessfulSearch.term);
+    }
+  }, [addSearch, search.lastSuccessfulSearch]);
 
   return (
     <main className="app-shell">
@@ -42,7 +52,7 @@ export function App() {
 
       <section className="app-region app-region--recent" aria-labelledby="recent-heading">
         <h2 id="recent-heading">Recent Searches</h2>
-        <p>Your latest searches will appear here.</p>
+        <RecentSearches searches={recentSearches} onSearch={search.searchRecentTerm} />
       </section>
     </main>
   );
