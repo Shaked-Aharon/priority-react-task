@@ -1,4 +1,5 @@
 import { mixcloudProvider } from "../api/mixcloudProvider";
+import { PaginationControls } from "../components/PaginationControls";
 import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
 import { useSearchController } from "../hooks/useSearchController";
@@ -24,6 +25,13 @@ export function App() {
           errorMessage={search.errorMessage}
           onRetry={search.retry}
           onSelect={search.selectResult}
+        />
+        <PaginationControls
+          canGoPrevious={search.canGoPrevious}
+          canGoNext={search.canGoNext}
+          isLoading={search.isLoading}
+          onPrevious={search.goPrevious}
+          onNext={search.goNext}
         />
       </section>
 
