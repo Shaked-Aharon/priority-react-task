@@ -13,7 +13,7 @@ Use this guide together with the numbered task files in `backlog/tasks/`.
 ## Recommended Commit Flow
 
 ```text
-T01 -> T02 -> T03 -> T04 -> T05 -> T06 -> T07 -> T08 -> T09 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15
+T01 -> T02 -> T03 -> T04 -> T05 -> T06 -> T07 -> T08 -> T09 -> T10 -> T11 -> T12 -> T13 -> T14 -> T15 -> T16 -> T17 -> T18 -> T19 -> T20 -> T21 -> T22 -> T23
 ```
 
 ## Architecture Rules

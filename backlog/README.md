@@ -30,6 +30,14 @@ The backlog is written for a junior developer. Follow the task numbers in order.
 13. `T13` - Apply responsive visual design.
 14. `T14` - Complete accessibility pass.
 15. `T15` - Write README and prepare repository handoff.
+16. `T16` - Add minimum search length.
+17. `T17` - Add search loading skeletons.
+18. `T18` - Review hook and controller cleanup.
+19. `T19` - Introduce theme design tokens.
+20. `T20` - Add light and dark theme support.
+21. `T21` - Add English and Hebrew localization.
+22. `T22` - Complete a motion polish pass.
+23. `T23` - Review search controller state and render performance.
 
 ## Stories
 
@@ -86,7 +94,7 @@ src/
 
 - Search fetches only 6 results per page.
 - Next and Previous use provider cursors.
-- Search input is debounced by about 300ms.
+- Search input is debounced by about 500ms.
 - In-flight requests are cancelled with `AbortController`.
 - Stale responses never overwrite current results.
 - Recent searches persist across visits, dedupe terms, and keep the last 5.
