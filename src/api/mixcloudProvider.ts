@@ -73,8 +73,7 @@ function mapCloudcast(cloudcast: MixcloudCloudcast): SoundSearchResult {
     title,
     artist,
     url,
-    imageUrl: pickImage(cloudcast.pictures),
-    embedUrl: buildEmbedUrl(url)
+    imageUrl: pickImage(cloudcast.pictures)
   };
 }
 
@@ -92,12 +91,4 @@ function pickImage(pictures: MixcloudPictureMap | undefined): string {
 
 function toCursor(url: string | undefined): SearchCursor | null {
   return url ? { url } : null;
-}
-
-function buildEmbedUrl(url: string): string {
-  const embedUrl = new URL("https://www.mixcloud.com/widget/iframe/");
-  embedUrl.searchParams.set("hide_cover", "1");
-  embedUrl.searchParams.set("mini", "1");
-  embedUrl.searchParams.set("feed", url);
-  return embedUrl.toString();
 }

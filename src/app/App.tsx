@@ -10,6 +10,7 @@ import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
 import { ThemeControls, type ThemePreference } from "../components/ThemeControls";
 import { ViewModeControls, type ViewMode } from "../components/ViewModeControls";
+import { useEffectiveTheme } from "../hooks/useEffectiveTheme";
 import { usePersistentPreference } from "../hooks/usePersistentPreference";
 import { useRecentSearches } from "../hooks/useRecentSearches";
 import { useSearchController } from "../hooks/useSearchController";
@@ -58,6 +59,7 @@ export function App() {
     LANGUAGES
   );
   const direction = languageDirections[language];
+  const effectiveTheme = useEffectiveTheme(themePreference);
   const t = messages[language];
   const previewRef = useRef<HTMLDivElement>(null);
   const [openPlayerResultId, setOpenPlayerResultId] = useState<string | null>(null);
@@ -147,7 +149,7 @@ export function App() {
           onOpenPlayer={() => setOpenPlayerResultId(selectedResult?.id ?? null)}
         />
         {selectedResult && isPlayerOpen ? (
-          <PlayerEmbed result={selectedResult} messages={t.player} />
+          <PlayerEmbed result={selectedResult} effectiveTheme={effectiveTheme} messages={t.player} />
         ) : null}
       </section>
 

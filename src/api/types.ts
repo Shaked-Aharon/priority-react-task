@@ -8,7 +8,6 @@ export type SoundSearchResult = {
   artist: string;
   url: string;
   imageUrl: string;
-  embedUrl: string;
 };
 
 export type SearchPage = {

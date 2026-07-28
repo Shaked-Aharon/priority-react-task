@@ -189,7 +189,6 @@ function track(id: string): SoundSearchResult {
     title: id,
     artist: "Test Artist",
     url: `https://example.test/${id}`,
-    imageUrl: `https://example.test/${id}.jpg`,
-    embedUrl: `https://example.test/${id}/embed`
+    imageUrl: `https://example.test/${id}.jpg`
   };
 }

@@ -43,9 +43,13 @@ Recent searches are stored as terms only, deduped case-insensitively, moved to t
 
 The UI uses a lightweight message catalog in `src/i18n/messages.ts` for English and Hebrew. The language preference persists, and Hebrew applies `lang="he"` with right-to-left document direction while Mixcloud result titles and artist names stay unchanged.
 
+## Theme
+
+The theme preference persists as `system`, `light`, or `dark`. `useEffectiveTheme` resolves `system` through `matchMedia("(prefers-color-scheme: dark)")`, so the Mixcloud player can receive a concrete light or dark embed URL without refetching existing results.
+
 ## Accessibility And Performance
 
-The UI uses native buttons, forms, semantic sections, list markup, visible focus styles, live regions for request states, and reduced-motion handling. The Mixcloud iframe is only rendered after the user clicks the selected artwork.
+The UI uses native buttons, forms, semantic sections, list markup, visible focus styles, live regions for request states, and reduced-motion handling. The Mixcloud iframe is only rendered after the user clicks the selected artwork, and `PlayerEmbed` builds the theme-aware iframe URL from the selected result source URL.
 
 ## Notes
 

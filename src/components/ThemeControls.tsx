@@ -1,6 +1,7 @@
 import type { Messages } from "../i18n/messages";
+import type { ThemePreference } from "../hooks/useEffectiveTheme";
 
-export type ThemePreference = "system" | "light" | "dark";
+export type { ThemePreference } from "../hooks/useEffectiveTheme";
 
 type ThemeControlsProps = {
   value: ThemePreference;
