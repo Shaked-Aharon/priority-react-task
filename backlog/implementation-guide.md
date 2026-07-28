@@ -48,7 +48,7 @@ Avoid starting with large UI tests. They are useful later, but the fastest value
 - Do not fetch before the user enters a search term.
 - Abort old requests before starting new ones.
 - Ignore stale responses.
-- Lazy-render the iframe player only after the user clicks the image.
+- Render the iframe player for the selected result, while keeping requests limited and stale responses ignored so immediate playback embed rendering does not add extra search traffic.
 - Animate `transform` and `opacity`, not width, height, top, or left.
 
 ## Accessibility Guidance

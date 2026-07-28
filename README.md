@@ -1,6 +1,6 @@
 # Sound Search
 
-React + TypeScript exam project for searching Mixcloud cloudcasts, browsing cursor-based pages, saving recent searches, previewing selected artwork, and lazily opening the selected Mixcloud player.
+React + TypeScript exam project for searching Mixcloud cloudcasts, browsing cursor-based pages, saving recent searches, and selecting a result to show its artwork and Mixcloud player.
 
 ## Setup
 
@@ -49,7 +49,7 @@ Language and theme preferences live in a compact settings popover in the search 
 
 ## Accessibility And Performance
 
-The UI uses native buttons, forms, semantic sections, list markup, visible focus styles, live regions for request states, and reduced-motion handling. The Mixcloud iframe is only rendered after the user clicks the selected artwork, and `PlayerEmbed` builds the theme-aware iframe URL from the selected result source URL.
+The UI uses native buttons, forms, semantic sections, list markup, visible focus styles, live regions for request states, and reduced-motion handling. Selecting a result renders the Mixcloud player for that result, and `PlayerEmbed` builds the theme-aware iframe URL from the selected result source URL.
 
 ## Notes
 

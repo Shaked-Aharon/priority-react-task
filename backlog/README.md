@@ -108,7 +108,7 @@ src/
 - Recent searches persist across visits, dedupe terms, and keep the last 5.
 - Clicking a recent search runs that search.
 - Clicking a result moves it to the image area and fades in the image.
-- Clicking the image embeds the track player.
+- Selecting a result shows its artwork and embeds the track player.
 - List/tile mode works and persists across visits.
 - Loading, empty, error, retry, disabled, and selected states are visible.
 - Core logic has unit tests.
