@@ -5,11 +5,10 @@ import type { Messages } from "../i18n/messages";
 type ImagePreviewProps = {
   result: SoundSearchResult | null;
   messages: Messages["preview"];
-  onOpenPlayer: () => void;
 };
 
 export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(function ImagePreview(
-  { result, messages, onOpenPlayer },
+  { result, messages },
   ref
 ) {
   return (
@@ -21,20 +20,13 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(functi
       aria-label={result ? messages.selectedLabel(result.title, result.artist) : messages.emptyLabel}
     >
       {result ? (
-        <button
-          className="image-preview__button"
-          type="button"
-          onClick={onOpenPlayer}
-          aria-label={messages.openPlayer(result.title)}
-        >
-          <figure className="image-preview__figure" key={result.id}>
-            <img src={result.imageUrl} alt="" />
-            <figcaption>
-              <strong>{result.title}</strong>
-              <span>{result.artist}</span>
-            </figcaption>
-          </figure>
-        </button>
+        <figure className="image-preview__figure" key={result.id}>
+          <img src={result.imageUrl} alt="" />
+          <figcaption>
+            <strong>{result.title}</strong>
+            <span>{result.artist}</span>
+          </figcaption>
+        </figure>
       ) : (
         <div className="image-preview__placeholder">
           <p>{messages.placeholder}</p>

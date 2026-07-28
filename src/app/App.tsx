@@ -1,14 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { mixcloudProvider } from "../api/mixcloudProvider";
 import type { SoundSearchResult } from "../api/types";
-import { ImagePreview } from "../components/ImagePreview";
-import { PaginationControls } from "../components/PaginationControls";
-import { PlayerEmbed } from "../components/PlayerEmbed";
-import { RecentSearches } from "../components/RecentSearches";
-import { SearchBar } from "../components/SearchBar";
-import { SearchResults } from "../components/SearchResults";
-import { SettingsPopover } from "../components/SettingsPopover";
-import { ViewModeControls, type ViewMode } from "../components/ViewModeControls";
+import type { ViewMode } from "../components/ViewModeControls";
 import { useEffectiveTheme, type ThemePreference } from "../hooks/useEffectiveTheme";
 import { usePersistentPreference } from "../hooks/usePersistentPreference";
 import { useRecentSearches } from "../hooks/useRecentSearches";
@@ -16,31 +9,15 @@ import { useSearchController } from "../hooks/useSearchController";
 import { LANGUAGES, languageDirections, messages, type Language } from "../i18n/messages";
 import { animateSelection } from "../lib/animation";
 import { STORAGE_KEYS } from "../lib/storage";
+import { PreviewPanel } from "./PreviewPanel";
+import { RecentPanel } from "./RecentPanel";
+import { SearchPanel } from "./SearchPanel";
 
 const VIEW_MODES = ["list", "tile"] as const;
 const THEME_PREFERENCES = ["system", "light", "dark"] as const;
 
 export function App() {
   const search = useSearchController(mixcloudProvider);
-  const {
-    activeQuery,
-    canGoNext,
-    canGoPrevious,
-    errorMessage,
-    goNext,
-    goPrevious,
-    inputQuery,
-    isLoading,
-    lastSuccessfulSearch,
-    results,
-    retry,
-    searchRecentTerm,
-    selectResult,
-    selectedResult,
-    setInputQuery,
-    status,
-    submitSearch
-  } = search;
   const { recentSearches, addSearch } = useRecentSearches();
   const [viewMode, setViewMode] = usePersistentPreference<ViewMode>(
     STORAGE_KEYS.viewMode,
@@ -61,14 +38,12 @@ export function App() {
   const effectiveTheme = useEffectiveTheme(themePreference);
   const t = messages[language];
   const previewRef = useRef<HTMLDivElement>(null);
-  const [openPlayerResultId, setOpenPlayerResultId] = useState<string | null>(null);
-  const isPlayerOpen = openPlayerResultId === selectedResult?.id;
 
   useEffect(() => {
-    if (lastSuccessfulSearch) {
-      addSearch(lastSuccessfulSearch.term);
+    if (search.lastSuccessfulSearch) {
+      addSearch(search.lastSuccessfulSearch.term);
     }
-  }, [addSearch, lastSuccessfulSearch]);
+  }, [addSearch, search.lastSuccessfulSearch]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = themePreference;
@@ -81,86 +56,38 @@ export function App() {
 
   const handleSelectResult = useCallback(
     (result: SoundSearchResult, sourceElement: HTMLElement) => {
-      selectResult(result);
+      search.selectResult(result);
 
       if (previewRef.current) {
         animateSelection(sourceElement, previewRef.current);
         window.setTimeout(() => previewRef.current?.focus(), 0);
       }
     },
-    [selectResult]
+    [search]
   );
 
   return (
     <main className="app-shell">
-      <section
-        className="app-region app-region--search"
-        aria-labelledby="search-heading"
-        aria-busy={isLoading}
-      >
-        <div className="app-region__header">
-          <h1 id="search-heading">{t.app.title}</h1>
-          <div className="app-preference-controls">
-            <SettingsPopover
-              language={language}
-              themePreference={themePreference}
-              messages={t.settings}
-              onLanguageChange={setLanguage}
-              onThemePreferenceChange={setThemePreference}
-            />
-          </div>
-        </div>
-        <SearchBar
-          value={inputQuery}
-          isLoading={isLoading}
-          messages={t.searchBar}
-          onChange={setInputQuery}
-          onSubmit={submitSearch}
-        />
-        <ViewModeControls
-          value={viewMode}
-          disabled={isLoading}
-          messages={t.viewMode}
-          onChange={setViewMode}
-        />
-        <SearchResults
-          activeQuery={activeQuery}
-          results={results}
-          selectedResult={selectedResult}
-          status={status}
-          errorMessage={errorMessage}
-          messages={t.results}
-          viewMode={viewMode}
-          onRetry={retry}
-          onSelect={handleSelectResult}
-        />
-        <PaginationControls
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-          isLoading={isLoading}
-          messages={t.pagination}
-          onPrevious={goPrevious}
-          onNext={goNext}
-        />
-      </section>
+      <SearchPanel
+        search={search}
+        viewMode={viewMode}
+        language={language}
+        themePreference={themePreference}
+        messages={t}
+        onViewModeChange={setViewMode}
+        onLanguageChange={setLanguage}
+        onThemePreferenceChange={setThemePreference}
+        onSelectResult={handleSelectResult}
+      />
 
-      <section className="app-region app-region--preview" aria-labelledby="preview-heading">
-        <h2 id="preview-heading">{t.app.previewHeading}</h2>
-        <ImagePreview
-          ref={previewRef}
-          result={selectedResult}
-          messages={t.preview}
-          onOpenPlayer={() => setOpenPlayerResultId(selectedResult?.id ?? null)}
-        />
-        {selectedResult && isPlayerOpen ? (
-          <PlayerEmbed result={selectedResult} effectiveTheme={effectiveTheme} messages={t.player} />
-        ) : null}
-      </section>
+      <PreviewPanel
+        ref={previewRef}
+        result={search.selectedResult}
+        effectiveTheme={effectiveTheme}
+        messages={t}
+      />
 
-      <section className="app-region app-region--recent" aria-labelledby="recent-heading">
-        <h2 id="recent-heading">{t.app.recentHeading}</h2>
-        <RecentSearches searches={recentSearches} messages={t.recent} onSearch={searchRecentTerm} />
-      </section>
+      <RecentPanel searches={recentSearches} messages={t} onSearch={search.searchRecentTerm} />
     </main>
   );
 }

@@ -588,7 +588,6 @@ select:focus-visible {
 }
 
 .image-preview__placeholder,
-.image-preview__button,
 .image-preview__figure {
   display: grid;
   min-height: clamp(18rem, 48vw, 27rem);
@@ -597,12 +596,6 @@ select:focus-visible {
   border: 1px dashed var(--color-border-dashed);
   border-radius: var(--radius-lg);
   background: var(--color-surface-muted);
-}
-
-.image-preview__button {
-  width: 100%;
-  padding: 0;
-  cursor: pointer;
 }
 
 .image-preview__figure {
@@ -652,7 +645,7 @@ select:focus-visible {
 .player-embed iframe {
   display: block;
   width: 100%;
-  height: 120px;
+  height: 180px;
   border: 0;
 }
 

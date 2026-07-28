@@ -77,7 +77,6 @@ export const messages = {
     preview: {
       selectedLabel: (title: string, artist: string) => `Selected result: ${title} by ${artist}`,
       emptyLabel: "No result selected",
-      openPlayer: (title: string) => `Open player for ${title}`,
       placeholder: "Select a result to preview its artwork."
     },
     player: {
@@ -86,18 +85,6 @@ export const messages = {
     }
   },
   he: {
-    settings: {
-      trigger: "׳”׳’׳“׳¨׳•׳×",
-      title: "׳”׳’׳“׳¨׳•׳×",
-      languageLabel: "׳©׳₪׳”",
-      themeLabel: "׳¢׳¨׳›׳× ׳ ׳•׳©׳",
-      close: "׳¡׳’׳™׳¨׳”",
-      english: "English",
-      hebrew: "׳¢׳‘׳¨׳™׳×",
-      system: "׳׳¢׳¨׳›׳×",
-      light: "׳‘׳”׳™׳¨",
-      dark: "׳›׳”׳”"
-    },
     app: {
       title: "חיפוש סאונד",
       previewHeading: "תצוגת תמונה",
@@ -110,6 +97,18 @@ export const messages = {
     },
     theme: {
       label: "העדפת ערכת נושא",
+      system: "מערכת",
+      light: "בהיר",
+      dark: "כהה"
+    },
+    settings: {
+      trigger: "הגדרות",
+      title: "הגדרות",
+      languageLabel: "שפה",
+      themeLabel: "ערכת נושא",
+      close: "סגירה",
+      english: "English",
+      hebrew: "עברית",
       system: "מערכת",
       light: "בהיר",
       dark: "כהה"
@@ -127,10 +126,10 @@ export const messages = {
     results: {
       defaultLabel: "תוצאות חיפוש",
       label: (query: string) => `תוצאות עבור ${query}`,
-      idleTitle: "מוכן כשאתם מוכנים",
+      idleTitle: "מוכן כשתהיו מוכנים",
       idleMessage: "הזינו מונח חיפוש כדי לעיין ב-cloudcasts ב-Mixcloud.",
       tooShortTitle: "המשיכו להקליד",
-      tooShortMessage: (minLength: number) => `מונחי חיפוש צריכים לפחות ${minLength} תווים.`,
+      tooShortMessage: (minLength: number) => `מונחי חיפוש צריכים לכלול לפחות ${minLength} תווים.`,
       errorTitle: "החיפוש נכשל",
       errorMessage: "החיפוש נכשל. נסו שוב.",
       retry: "נסו שוב",
@@ -153,7 +152,6 @@ export const messages = {
     preview: {
       selectedLabel: (title: string, artist: string) => `תוצאה נבחרת: ${title} מאת ${artist}`,
       emptyLabel: "לא נבחרה תוצאה",
-      openPlayer: (title: string) => `פתיחת נגן עבור ${title}`,
       placeholder: "בחרו תוצאה כדי להציג את התמונה שלה."
     },
     player: {
