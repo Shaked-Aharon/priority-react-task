@@ -22,14 +22,14 @@ The app is built with Vite, React, TypeScript, Vitest, and React Testing Library
 ## Architecture
 
 - `src/api/` owns app-level API types and the provider interface. `mixcloudProvider.ts` is the only Mixcloud-specific adapter, so a different sound API can replace it by implementing `SoundProvider`.
-- `src/hooks/` owns browser and React behavior: debounced input, request orchestration, persistent recent searches, and persistent preferences.
+- `src/hooks/` owns browser and React behavior: debounced input, sound search request lifecycle, search intent orchestration, persistent recent searches, and persistent preferences.
 - `src/lib/` contains pure helpers for recent-search ordering, cursor pagination, safe storage, and selection animation.
 - `src/components/` contains presentational UI: search form, results, pagination, recent searches, preview, player, and view-mode controls.
 - `src/app/App.tsx` composes the provider, hooks, and UI.
 
 ## Async Search
 
-Search input is debounced at about 500ms, and trimmed terms must be at least 3 characters before a Mixcloud request is sent or saved to recent searches. Each request gets its own `AbortController`, and the controller keeps a request id so stale responses cannot overwrite newer results. Retry repeats the latest failed request snapshot.
+Search input is debounced at about 500ms, and trimmed terms must be at least 3 characters before a Mixcloud request is sent or saved to recent searches. `useSearchController` owns input, validation, active query, pagination intent, selection, and successful recent-search events. `useSoundSearchRequest` owns the Mixcloud request lifecycle: loading and error state, request aborts, stale response protection, and retrying the latest failed request snapshot. Submitted and recent-search terms are deduped so the later debounce pass does not repeat the same first-page request.
 
 ## Pagination
 

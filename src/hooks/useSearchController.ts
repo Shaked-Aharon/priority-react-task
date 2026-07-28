@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SoundProvider } from "../api/soundProvider";
-import type { SearchCursor, SoundSearchResult } from "../api/types";
+import type { SearchPage, SoundSearchResult } from "../api/types";
 import {
   canGoNext,
   canGoPrevious,
@@ -12,27 +12,26 @@ import {
 } from "../lib/pagination";
 import { cleanSearchTerm, isValidSearchTerm } from "../lib/recentSearches";
 import { useDebouncedValue } from "./useDebouncedValue";
+import {
+  useSoundSearchRequest,
+  type SearchStatus,
+  type SoundSearchRequestSnapshot
+} from "./useSoundSearchRequest";
+
+export type { SearchStatus } from "./useSoundSearchRequest";
 
 const SEARCH_DEBOUNCE_MS = 500;
 const PAGE_SIZE = 6;
-
-export type SearchStatus = "idle" | "tooShort" | "loading" | "success" | "empty" | "error";
 
 export type SuccessfulSearchEvent = {
   id: number;
   term: string;
 };
 
-type SearchRequestKind = "first" | "next" | "previous";
-
-type RequestSnapshot = {
-  kind: SearchRequestKind;
-  query: string;
-  cursor: SearchCursor | null;
-  pagination: PaginationState;
-};
-
-function getPaginationAfterPage(snapshot: RequestSnapshot, nextCursor: SearchCursor | null): PaginationState {
+function getPaginationAfterPage(
+  snapshot: SoundSearchRequestSnapshot,
+  nextCursor: SearchPage["nextCursor"]
+): PaginationState {
   if (snapshot.kind === "first") {
     return startPagination(nextCursor);
   }
@@ -47,84 +46,75 @@ function getPaginationAfterPage(snapshot: RequestSnapshot, nextCursor: SearchCur
 export function useSearchController(provider: SoundProvider) {
   const [inputQuery, setInputQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
-  const [results, setResults] = useState<SoundSearchResult[]>([]);
   const [selectedResult, setSelectedResult] = useState<SoundSearchResult | null>(null);
-  const [status, setStatus] = useState<SearchStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
   const [pagination, setPagination] = useState<PaginationState>(initialPaginationState);
   const [lastSuccessfulSearch, setLastSuccessfulSearch] = useState<SuccessfulSearchEvent | null>(null);
 
   const debouncedQuery = useDebouncedValue(inputQuery, SEARCH_DEBOUNCE_MS);
-  const requestIdRef = useRef(0);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const failedRequestRef = useRef<RequestSnapshot | null>(null);
+  const dedupedDebouncedFirstQueryRef = useRef<string | null>(null);
 
-  const resetRequestState = useCallback((nextStatus: SearchStatus, nextActiveQuery = "") => {
-    abortControllerRef.current?.abort();
-    requestIdRef.current += 1;
-    failedRequestRef.current = null;
-    setActiveQuery(nextActiveQuery);
-    setResults([]);
+  const handleRequestSuccess = useCallback((snapshot: SoundSearchRequestSnapshot, page: SearchPage) => {
     setSelectedResult(null);
-    setStatus(nextStatus);
-    setErrorMessage("");
-    setPagination(initialPaginationState);
+    setPagination(getPaginationAfterPage(snapshot, page.nextCursor));
+
+    if (snapshot.kind === "first") {
+      setLastSuccessfulSearch((currentEvent) => ({
+        id: (currentEvent?.id ?? 0) + 1,
+        term: snapshot.query
+      }));
+    }
   }, []);
 
-  const startRequest = useCallback(
-    async (snapshot: RequestSnapshot) => {
-      abortControllerRef.current?.abort();
+  const {
+    results,
+    status,
+    errorMessage,
+    isLoading,
+    resetRequestState: resetSoundSearchRequestState,
+    startRequest,
+    retry: retryFailedRequest
+  } = useSoundSearchRequest(provider, {
+    pageSize: PAGE_SIZE,
+    onSuccess: handleRequestSuccess
+  });
 
-      const requestId = requestIdRef.current + 1;
-      requestIdRef.current = requestId;
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
-
-      setStatus("loading");
-      setErrorMessage("");
-      setActiveQuery(snapshot.query);
-
-      try {
-        const page = await provider.search({
-          query: snapshot.query,
-          cursor: snapshot.cursor,
-          pageSize: PAGE_SIZE,
-          signal: abortController.signal
-        });
-
-        if (requestId !== requestIdRef.current) {
-          return;
-        }
-
-        setResults(page.results);
-        setSelectedResult(null);
-        setStatus(page.results.length > 0 ? "success" : "empty");
-        setPagination(getPaginationAfterPage(snapshot, page.nextCursor));
-        failedRequestRef.current = null;
-
-        if (snapshot.kind === "first") {
-          setLastSuccessfulSearch((currentEvent) => ({
-            id: (currentEvent?.id ?? 0) + 1,
-            term: snapshot.query
-          }));
-        }
-      } catch (error) {
-        if (abortController.signal.aborted || requestId !== requestIdRef.current) {
-          return;
-        }
-
-        failedRequestRef.current = snapshot;
-        setResults([]);
-        setSelectedResult(null);
-        setStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : "");
-      }
+  const resetRequestState = useCallback(
+    (nextStatus: SearchStatus, nextActiveQuery = "") => {
+      resetSoundSearchRequestState(nextStatus);
+      dedupedDebouncedFirstQueryRef.current = null;
+      setActiveQuery(nextActiveQuery);
+      setSelectedResult(null);
+      setPagination(initialPaginationState);
     },
-    [provider]
+    [resetSoundSearchRequestState]
+  );
+
+  const startFirstPageRequest = useCallback(
+    (query: string, source: "debounce" | "immediate") => {
+      if (source === "debounce" && dedupedDebouncedFirstQueryRef.current === query) {
+        dedupedDebouncedFirstQueryRef.current = null;
+        return;
+      }
+
+      if (source === "immediate") {
+        dedupedDebouncedFirstQueryRef.current = query;
+      }
+
+      setActiveQuery(query);
+      setSelectedResult(null);
+      setPagination(initialPaginationState);
+      void startRequest({
+        kind: "first",
+        query,
+        cursor: null,
+        pagination: initialPaginationState
+      });
+    },
+    [startRequest]
   );
 
   const searchFirstPage = useCallback(
-    (term: string) => {
+    (term: string, source: "debounce" | "immediate" = "immediate") => {
       const query = cleanSearchTerm(term);
 
       if (!query) {
@@ -137,18 +127,13 @@ export function useSearchController(provider: SoundProvider) {
         return;
       }
 
-      void startRequest({
-        kind: "first",
-        query,
-        cursor: null,
-        pagination: initialPaginationState
-      });
+      startFirstPageRequest(query, source);
     },
-    [resetRequestState, startRequest]
+    [resetRequestState, startFirstPageRequest]
   );
 
   useEffect(() => {
-    searchFirstPage(debouncedQuery);
+    searchFirstPage(debouncedQuery, "debounce");
   }, [debouncedQuery, searchFirstPage]);
 
   const submitSearch = useCallback(() => {
@@ -192,26 +177,16 @@ export function useSearchController(provider: SoundProvider) {
   }, [activeQuery, pagination, startRequest, status]);
 
   const retry = useCallback(() => {
-    const failedRequest = failedRequestRef.current;
-
-    if (!failedRequest || status === "loading") {
+    if (status === "loading") {
       return;
     }
 
-    void startRequest(failedRequest);
-  }, [startRequest, status]);
+    retryFailedRequest();
+  }, [retryFailedRequest, status]);
 
   const selectResult = useCallback((result: SoundSearchResult) => {
     setSelectedResult(result);
   }, []);
-
-  useEffect(() => {
-    return () => {
-      abortControllerRef.current?.abort();
-    };
-  }, []);
-
-  const isLoading = status === "loading";
 
   return useMemo(
     () => ({

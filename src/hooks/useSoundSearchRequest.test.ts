@@ -3,99 +3,33 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SoundProvider } from "../api/soundProvider";
 import type { SearchCursor, SearchPage, SoundSearchResult } from "../api/types";
-import { useSearchController } from "./useSearchController";
+import { initialPaginationState } from "../lib/pagination";
+import {
+  useSoundSearchRequest,
+  type SoundSearchRequestSnapshot
+} from "./useSoundSearchRequest";
 
 const mountedHooks: { unmount: () => void }[] = [];
 
 afterEach(() => {
   mountedHooks.splice(0).forEach((hook) => hook.unmount());
-  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
-describe("useSearchController", () => {
-  it("dedupes a submitted search when debounce catches up", async () => {
-    vi.useFakeTimers();
-    const search = vi.fn().mockResolvedValue(page([track("ambient-track")]));
-    const hook = renderSearchController({ search });
-
-    act(() => {
-      hook.current.setInputQuery("ambient");
-    });
-    act(() => {
-      hook.current.submitSearch();
-    });
-
-    await flushPromises();
-
-    await act(async () => {
-      vi.advanceTimersByTime(500);
-      await Promise.resolve();
-    });
-
-    expect(search).toHaveBeenCalledTimes(1);
-    expect(search.mock.calls[0][0]).toMatchObject({
-      query: "ambient",
-      cursor: null,
-      pageSize: 6
-    });
-  });
-
-  it("dedupes a recent search when debounce catches up", async () => {
-    vi.useFakeTimers();
-    const search = vi.fn().mockResolvedValue(page([track("soul-track")]));
-    const hook = renderSearchController({ search });
-
-    act(() => {
-      hook.current.searchRecentTerm("soul");
-    });
-
-    await flushPromises();
-
-    await act(async () => {
-      vi.advanceTimersByTime(500);
-      await Promise.resolve();
-    });
-
-    expect(search).toHaveBeenCalledTimes(1);
-    expect(search.mock.calls[0][0]).toMatchObject({
-      query: "soul",
-      cursor: null,
-      pageSize: 6
-    });
-  });
-
-  it("does not search for empty or too-short terms", () => {
-    const search = vi.fn(async () => page());
-    const hook = renderSearchController({ search });
-
-    act(() => {
-      hook.current.searchRecentTerm("  ");
-    });
-
-    expect(hook.current.status).toBe("idle");
-
-    act(() => {
-      hook.current.searchRecentTerm("ab");
-    });
-
-    expect(hook.current.status).toBe("tooShort");
-    expect(search).not.toHaveBeenCalled();
-  });
-
+describe("useSoundSearchRequest", () => {
   it("does not let stale responses replace newer results", async () => {
     const jazzRequest = deferred<SearchPage>();
     const houseRequest = deferred<SearchPage>();
     const search = vi.fn((request: Parameters<SoundProvider["search"]>[0]) =>
       request.query === "jazz" ? jazzRequest.promise : houseRequest.promise
     );
-    const hook = renderSearchController({ search });
+    const hook = renderSoundSearchRequest({ search });
 
     act(() => {
-      hook.current.searchRecentTerm("jazz");
+      hook.current.startRequest(firstPageSnapshot("jazz"));
     });
     act(() => {
-      hook.current.searchRecentTerm("house");
+      hook.current.startRequest(firstPageSnapshot("house"));
     });
 
     await act(async () => {
@@ -108,7 +42,6 @@ describe("useSearchController", () => {
     });
 
     expect(hook.current.status).toBe("success");
-    expect(hook.current.activeQuery).toBe("house");
     expect(hook.current.results).toEqual([track("house-track")]);
   });
 
@@ -117,10 +50,10 @@ describe("useSearchController", () => {
       .fn()
       .mockRejectedValueOnce(new Error("temporary failure"))
       .mockResolvedValueOnce(page([track("retry-track")]));
-    const hook = renderSearchController({ search });
+    const hook = renderSoundSearchRequest({ search });
 
     act(() => {
-      hook.current.searchRecentTerm("garage");
+      hook.current.startRequest(firstPageSnapshot("garage"));
     });
 
     await flushPromises();
@@ -132,7 +65,6 @@ describe("useSearchController", () => {
 
     await flushPromises();
     expect(hook.current.status).toBe("success");
-
     expect(search).toHaveBeenCalledTimes(2);
     expect(search.mock.calls[1][0]).toMatchObject({
       query: "garage",
@@ -142,63 +74,53 @@ describe("useSearchController", () => {
     expect(hook.current.results).toEqual([track("retry-track")]);
   });
 
-  it("uses provider cursors for next and previous pages", async () => {
+  it("passes provider cursors and snapshots through pagination requests", async () => {
     const pageTwoCursor = cursor("page-2");
     const pageThreeCursor = cursor("page-3");
+    const onSuccess = vi.fn();
     const search = vi
       .fn()
       .mockResolvedValueOnce(page([track("page-1")], pageTwoCursor))
-      .mockResolvedValueOnce(page([track("page-2")], pageThreeCursor))
-      .mockResolvedValueOnce(page([track("page-1-again")], pageTwoCursor));
-    const hook = renderSearchController({ search });
+      .mockResolvedValueOnce(page([track("page-2")], pageThreeCursor));
+    const hook = renderSoundSearchRequest({ search }, onSuccess);
 
+    const firstSnapshot = firstPageSnapshot("ambient");
     act(() => {
-      hook.current.searchRecentTerm("ambient");
+      hook.current.startRequest(firstSnapshot);
     });
     await flushPromises();
-    expect(hook.current.canGoNext).toBe(true);
 
+    const nextSnapshot: SoundSearchRequestSnapshot = {
+      kind: "next",
+      query: "ambient",
+      cursor: pageTwoCursor,
+      pagination: {
+        currentCursor: null,
+        previousCursors: [],
+        nextCursor: pageTwoCursor
+      }
+    };
     act(() => {
-      hook.current.goNext();
+      hook.current.startRequest(nextSnapshot);
     });
     await flushPromises();
-    expect(hook.current.results).toEqual([track("page-2")]);
-
-    act(() => {
-      hook.current.goPrevious();
-    });
-    await flushPromises();
-    expect(hook.current.results).toEqual([track("page-1-again")]);
 
     expect(search.mock.calls[1][0].cursor).toEqual(pageTwoCursor);
-    expect(search.mock.calls[2][0].cursor).toBeNull();
-  });
-
-  it("emits a recent-search event for successful first-page searches", async () => {
-    const search = vi.fn().mockResolvedValue(page([track("soul-track")]));
-    const hook = renderSearchController({ search });
-
-    act(() => {
-      hook.current.searchRecentTerm("  soul  ");
-    });
-
-    await flushPromises();
-    expect(hook.current.status).toBe("success");
-
-    expect(hook.current.lastSuccessfulSearch).toEqual({
-      id: 1,
-      term: "soul"
-    });
+    expect(onSuccess).toHaveBeenNthCalledWith(1, firstSnapshot, page([track("page-1")], pageTwoCursor));
+    expect(onSuccess).toHaveBeenNthCalledWith(2, nextSnapshot, page([track("page-2")], pageThreeCursor));
   });
 });
 
-function renderSearchController(provider: SoundProvider) {
-  let current: ReturnType<typeof useSearchController> | undefined;
+function renderSoundSearchRequest(
+  provider: SoundProvider,
+  onSuccess: (snapshot: SoundSearchRequestSnapshot, page: SearchPage) => void = vi.fn()
+) {
+  let current: ReturnType<typeof useSoundSearchRequest> | undefined;
   const container = document.createElement("div");
   const root: Root = createRoot(container);
 
   function Harness() {
-    current = useSearchController(provider);
+    current = useSoundSearchRequest(provider, { pageSize: 6, onSuccess });
     return null;
   }
 
@@ -242,6 +164,15 @@ function deferred<TValue>() {
   });
 
   return { promise, resolve, reject };
+}
+
+function firstPageSnapshot(query: string): SoundSearchRequestSnapshot {
+  return {
+    kind: "first",
+    query,
+    cursor: null,
+    pagination: initialPaginationState
+  };
 }
 
 function cursor(name: string): SearchCursor {
