@@ -51,6 +51,8 @@ Language and theme preferences live in a compact settings popover in the search 
 
 The UI uses native buttons, forms, semantic sections, list markup, visible focus styles, live regions for request states, and reduced-motion handling. Selecting a result renders the Mixcloud player for that result, and `PlayerEmbed` builds the theme-aware iframe URL from the selected result source URL.
 
+Manual accessibility QA should include keyboard search/result selection, settings popover open and close with focus return, light/dark/system theme selection, and switching to Hebrew to confirm `dir="rtl"` while form labels remain associated with their controls.
+
 ## Notes
 
 Mixcloud response parsing is intentionally contained in the provider. If the public API changes shape, the UI should not need changes unless the app-owned `SoundSearchResult` contract changes.
