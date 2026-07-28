@@ -72,6 +72,7 @@ src/
     ResultTile.tsx
     SearchBar.tsx
     SearchResults.tsx
+    SettingsPopover.tsx
     StateMessage.tsx
     ViewModeControls.tsx
   hooks/
