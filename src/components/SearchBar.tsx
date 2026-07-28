@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import { isValidSearchTerm } from "../lib/recentSearches";
 
 type SearchBarProps = {
   value: string;
@@ -8,8 +9,13 @@ type SearchBarProps = {
 };
 
 export function SearchBar({ value, isLoading, onChange, onSubmit }: SearchBarProps) {
+  const canSubmit = isValidSearchTerm(value);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canSubmit) {
+      return;
+    }
     onSubmit();
   }
 
@@ -27,7 +33,7 @@ export function SearchBar({ value, isLoading, onChange, onSubmit }: SearchBarPro
           placeholder="Try jazz, techno, soul..."
           autoComplete="off"
         />
-        <button type="submit" disabled={isLoading || value.trim().length === 0}>
+        <button type="submit" disabled={isLoading || !canSubmit}>
           Search
         </button>
       </div>

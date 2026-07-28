@@ -10,13 +10,13 @@ import {
   startPagination,
   type PaginationState
 } from "../lib/pagination";
-import { cleanSearchTerm } from "../lib/recentSearches";
+import { cleanSearchTerm, isValidSearchTerm } from "../lib/recentSearches";
 import { useDebouncedValue } from "./useDebouncedValue";
 
 const SEARCH_DEBOUNCE_MS = 300;
 const PAGE_SIZE = 6;
 
-export type SearchStatus = "idle" | "loading" | "success" | "empty" | "error";
+export type SearchStatus = "idle" | "tooShort" | "loading" | "success" | "empty" | "error";
 
 export type SuccessfulSearchEvent = {
   id: number;
@@ -120,6 +120,18 @@ export function useSearchController(provider: SoundProvider) {
         setResults([]);
         setSelectedResult(null);
         setStatus("idle");
+        setErrorMessage("");
+        setPagination(initialPaginationState);
+        return;
+      }
+
+      if (!isValidSearchTerm(query)) {
+        abortControllerRef.current?.abort();
+        requestIdRef.current += 1;
+        setActiveQuery(query);
+        setResults([]);
+        setSelectedResult(null);
+        setStatus("tooShort");
         setErrorMessage("");
         setPagination(initialPaginationState);
         return;

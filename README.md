@@ -29,7 +29,7 @@ The app is built with Vite, React, TypeScript, Vitest, and React Testing Library
 
 ## Async Search
 
-Search input is debounced at about 300ms. Each request gets its own `AbortController`, and the controller keeps a request id so stale responses cannot overwrite newer results. Retry repeats the latest failed request snapshot.
+Search input is debounced at about 300ms, and trimmed terms must be at least 3 characters before a Mixcloud request is sent or saved to recent searches. Each request gets its own `AbortController`, and the controller keeps a request id so stale responses cannot overwrite newer results. Retry repeats the latest failed request snapshot.
 
 ## Pagination
 

@@ -1,5 +1,6 @@
 import type { SoundSearchResult } from "../api/types";
 import type { SearchStatus } from "../hooks/useSearchController";
+import { MIN_SEARCH_TERM_LENGTH } from "../lib/recentSearches";
 import { ResultListItem } from "./ResultListItem";
 import { ResultTile } from "./ResultTile";
 import { StateMessage } from "./StateMessage";
@@ -39,6 +40,15 @@ export function SearchResults({
 
   if (status === "loading") {
     return <StateMessage title="Searching" message={`Looking for "${activeQuery}"...`} />;
+  }
+
+  if (status === "tooShort") {
+    return (
+      <StateMessage
+        title="Keep typing"
+        message={`Search terms need at least ${MIN_SEARCH_TERM_LENGTH} characters.`}
+      />
+    );
   }
 
   if (status === "error") {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addRecentSearch, areSameSearchTerm, cleanSearchTerm } from "./recentSearches";
+import { addRecentSearch, areSameSearchTerm, cleanSearchTerm, isValidSearchTerm } from "./recentSearches";
 
 describe("recent search helpers", () => {
   it("trims search terms", () => {
@@ -12,6 +12,16 @@ describe("recent search helpers", () => {
 
   it("ignores empty or whitespace-only input", () => {
     expect(addRecentSearch(["jazz"], "   ")).toEqual(["jazz"]);
+  });
+
+  it("validates cleaned search terms by minimum length", () => {
+    expect(isValidSearchTerm("")).toBe(false);
+    expect(isValidSearchTerm("  ab  ")).toBe(false);
+    expect(isValidSearchTerm("abc")).toBe(true);
+  });
+
+  it("ignores terms shorter than the minimum length", () => {
+    expect(addRecentSearch(["jazz"], "ab")).toEqual(["jazz"]);
   });
 
   it("adds the newest term to the top", () => {
