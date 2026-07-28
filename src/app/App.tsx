@@ -22,7 +22,25 @@ const THEME_PREFERENCES = ["system", "light", "dark"] as const;
 
 export function App() {
   const search = useSearchController(mixcloudProvider);
-  const { selectResult } = search;
+  const {
+    activeQuery,
+    canGoNext,
+    canGoPrevious,
+    errorMessage,
+    goNext,
+    goPrevious,
+    inputQuery,
+    isLoading,
+    lastSuccessfulSearch,
+    results,
+    retry,
+    searchRecentTerm,
+    selectResult,
+    selectedResult,
+    setInputQuery,
+    status,
+    submitSearch
+  } = search;
   const { recentSearches, addSearch } = useRecentSearches();
   const [viewMode, setViewMode] = usePersistentPreference<ViewMode>(
     STORAGE_KEYS.viewMode,
@@ -43,13 +61,13 @@ export function App() {
   const t = messages[language];
   const previewRef = useRef<HTMLDivElement>(null);
   const [openPlayerResultId, setOpenPlayerResultId] = useState<string | null>(null);
-  const isPlayerOpen = openPlayerResultId === search.selectedResult?.id;
+  const isPlayerOpen = openPlayerResultId === selectedResult?.id;
 
   useEffect(() => {
-    if (search.lastSuccessfulSearch) {
-      addSearch(search.lastSuccessfulSearch.term);
+    if (lastSuccessfulSearch) {
+      addSearch(lastSuccessfulSearch.term);
     }
-  }, [addSearch, search.lastSuccessfulSearch]);
+  }, [addSearch, lastSuccessfulSearch]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = themePreference;
@@ -77,7 +95,7 @@ export function App() {
       <section
         className="app-region app-region--search"
         aria-labelledby="search-heading"
-        aria-busy={search.isLoading}
+        aria-busy={isLoading}
       >
         <div className="app-region__header">
           <h1 id="search-heading">{t.app.title}</h1>
@@ -87,36 +105,36 @@ export function App() {
           </div>
         </div>
         <SearchBar
-          value={search.inputQuery}
-          isLoading={search.isLoading}
+          value={inputQuery}
+          isLoading={isLoading}
           messages={t.searchBar}
-          onChange={search.setInputQuery}
-          onSubmit={search.submitSearch}
+          onChange={setInputQuery}
+          onSubmit={submitSearch}
         />
         <ViewModeControls
           value={viewMode}
-          disabled={search.isLoading}
+          disabled={isLoading}
           messages={t.viewMode}
           onChange={setViewMode}
         />
         <SearchResults
-          activeQuery={search.activeQuery}
-          results={search.results}
-          selectedResult={search.selectedResult}
-          status={search.status}
-          errorMessage={search.errorMessage}
+          activeQuery={activeQuery}
+          results={results}
+          selectedResult={selectedResult}
+          status={status}
+          errorMessage={errorMessage}
           messages={t.results}
           viewMode={viewMode}
-          onRetry={search.retry}
+          onRetry={retry}
           onSelect={handleSelectResult}
         />
         <PaginationControls
-          canGoPrevious={search.canGoPrevious}
-          canGoNext={search.canGoNext}
-          isLoading={search.isLoading}
+          canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
+          isLoading={isLoading}
           messages={t.pagination}
-          onPrevious={search.goPrevious}
-          onNext={search.goNext}
+          onPrevious={goPrevious}
+          onNext={goNext}
         />
       </section>
 
@@ -124,18 +142,18 @@ export function App() {
         <h2 id="preview-heading">{t.app.previewHeading}</h2>
         <ImagePreview
           ref={previewRef}
-          result={search.selectedResult}
+          result={selectedResult}
           messages={t.preview}
-          onOpenPlayer={() => setOpenPlayerResultId(search.selectedResult?.id ?? null)}
+          onOpenPlayer={() => setOpenPlayerResultId(selectedResult?.id ?? null)}
         />
-        {search.selectedResult && isPlayerOpen ? (
-          <PlayerEmbed result={search.selectedResult} messages={t.player} />
+        {selectedResult && isPlayerOpen ? (
+          <PlayerEmbed result={selectedResult} messages={t.player} />
         ) : null}
       </section>
 
       <section className="app-region app-region--recent" aria-labelledby="recent-heading">
         <h2 id="recent-heading">{t.app.recentHeading}</h2>
-        <RecentSearches searches={recentSearches} messages={t.recent} onSearch={search.searchRecentTerm} />
+        <RecentSearches searches={recentSearches} messages={t.recent} onSearch={searchRecentTerm} />
       </section>
     </main>
   );

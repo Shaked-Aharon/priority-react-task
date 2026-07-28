@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SoundProvider } from "../api/soundProvider";
 import type { SearchCursor, SoundSearchResult } from "../api/types";
 import {
@@ -213,24 +213,43 @@ export function useSearchController(provider: SoundProvider) {
 
   const isLoading = status === "loading";
 
-  return {
-    inputQuery,
-    activeQuery,
-    results,
-    selectedResult,
-    status,
-    errorMessage,
-    pagination,
-    lastSuccessfulSearch,
-    isLoading,
-    canGoPrevious: !isLoading && canGoPrevious(pagination),
-    canGoNext: !isLoading && canGoNext(pagination),
-    setInputQuery,
-    submitSearch,
-    searchRecentTerm,
-    goNext,
-    goPrevious,
-    retry,
-    selectResult
-  };
+  return useMemo(
+    () => ({
+      inputQuery,
+      activeQuery,
+      results,
+      selectedResult,
+      status,
+      errorMessage,
+      pagination,
+      lastSuccessfulSearch,
+      isLoading,
+      canGoPrevious: !isLoading && canGoPrevious(pagination),
+      canGoNext: !isLoading && canGoNext(pagination),
+      setInputQuery,
+      submitSearch,
+      searchRecentTerm,
+      goNext,
+      goPrevious,
+      retry,
+      selectResult
+    }),
+    [
+      activeQuery,
+      errorMessage,
+      goNext,
+      goPrevious,
+      inputQuery,
+      isLoading,
+      lastSuccessfulSearch,
+      pagination,
+      results,
+      retry,
+      searchRecentTerm,
+      selectedResult,
+      selectResult,
+      status,
+      submitSearch
+    ]
+  );
 }
