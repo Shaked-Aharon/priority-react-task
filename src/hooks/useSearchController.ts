@@ -13,7 +13,7 @@ import {
 import { cleanSearchTerm, isValidSearchTerm } from "../lib/recentSearches";
 import { useDebouncedValue } from "./useDebouncedValue";
 
-const SEARCH_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 500;
 const PAGE_SIZE = 6;
 
 export type SearchStatus = "idle" | "tooShort" | "loading" | "success" | "empty" | "error";

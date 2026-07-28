@@ -6,6 +6,8 @@ import { ResultTile } from "./ResultTile";
 import { StateMessage } from "./StateMessage";
 import type { ViewMode } from "./ViewModeControls";
 
+const SKELETON_ITEM_COUNT = 6;
+
 type SearchResultsProps = {
   activeQuery: string;
   results: SoundSearchResult[];
@@ -38,10 +40,6 @@ export function SearchResults({
     );
   }
 
-  if (status === "loading") {
-    return <StateMessage title="Searching" message={`Looking for "${activeQuery}"...`} />;
-  }
-
   if (status === "tooShort") {
     return (
       <StateMessage
@@ -49,6 +47,10 @@ export function SearchResults({
         message={`Search terms need at least ${MIN_SEARCH_TERM_LENGTH} characters.`}
       />
     );
+  }
+
+  if (status === "loading") {
+    return <SearchResultsSkeleton activeQuery={activeQuery} viewMode={viewMode} />;
   }
 
   if (status === "error") {
@@ -81,5 +83,41 @@ export function SearchResults({
         />
       ))}
     </ul>
+  );
+}
+
+function SearchResultsSkeleton({
+  activeQuery,
+  viewMode
+}: {
+  activeQuery: string;
+  viewMode: ViewMode;
+}) {
+  const listClassName = viewMode === "tile" ? "result-grid" : "result-list";
+  const itemClassName = viewMode === "tile" ? "result-grid__item" : "result-list__item";
+  const cardClassName =
+    viewMode === "tile"
+      ? "result-card result-card--tile result-card--skeleton"
+      : "result-card result-card--list result-card--skeleton";
+
+  return (
+    <>
+      <p className="sr-only" role="status" aria-live="polite">
+        {activeQuery ? `Searching for ${activeQuery}.` : "Searching."}
+      </p>
+      <ul className={listClassName} aria-label="Loading search results" aria-hidden="true">
+        {Array.from({ length: SKELETON_ITEM_COUNT }, (_, index) => (
+          <li className={itemClassName} key={index}>
+            <div className={cardClassName}>
+              <span className="result-card__skeleton-artwork skeleton-shimmer" />
+              <span className="result-card__text">
+                <span className="result-card__skeleton-line result-card__skeleton-line--title skeleton-shimmer" />
+                <span className="result-card__skeleton-line result-card__skeleton-line--artist skeleton-shimmer" />
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }

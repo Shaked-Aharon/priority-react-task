@@ -113,6 +113,16 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 .state-message {
   border: 1px dashed #c6d4cc;
   border-radius: 8px;
@@ -217,6 +227,56 @@ input:focus-visible {
 
 .result-card--tile .result-card__text {
   width: 100%;
+}
+
+.result-card--skeleton {
+  pointer-events: none;
+}
+
+.result-card--list.result-card--skeleton {
+  padding: 0.7rem 0.9rem;
+}
+
+.result-card--tile.result-card--skeleton {
+  padding: 0.65rem;
+}
+
+.result-card__skeleton-artwork,
+.result-card__skeleton-line {
+  display: block;
+  border-radius: 6px;
+  background: #e5ede8;
+}
+
+.result-card--list .result-card__skeleton-artwork {
+  width: 4.25rem;
+  height: 4.25rem;
+  flex: 0 0 auto;
+}
+
+.result-card--tile .result-card__skeleton-artwork {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.result-card__skeleton-line {
+  height: 0.9rem;
+}
+
+.result-card__skeleton-line--title {
+  width: min(13rem, 86%);
+}
+
+.result-card__skeleton-line--artist {
+  width: min(9rem, 62%);
+}
+
+.skeleton-shimmer {
+  background:
+    linear-gradient(90deg, rgba(229, 237, 232, 0), rgba(255, 255, 255, 0.78), rgba(229, 237, 232, 0)),
+    #e5ede8;
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.25s ease-in-out infinite;
 }
 
 .view-mode-controls {
@@ -372,6 +432,16 @@ input:focus-visible {
   }
 }
 
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -380,6 +450,10 @@ input:focus-visible {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .skeleton-shimmer {
+    background: #e5ede8;
   }
 }
 
@@ -416,6 +490,11 @@ input:focus-visible {
   }
 
   .result-card--list img {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .result-card--list .result-card__skeleton-artwork {
     width: 3.5rem;
     height: 3.5rem;
   }
