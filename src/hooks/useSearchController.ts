@@ -32,6 +32,18 @@ type RequestSnapshot = {
   pagination: PaginationState;
 };
 
+function getPaginationAfterPage(snapshot: RequestSnapshot, nextCursor: SearchCursor | null): PaginationState {
+  if (snapshot.kind === "first") {
+    return startPagination(nextCursor);
+  }
+
+  if (snapshot.kind === "next") {
+    return moveToNextPage(snapshot.pagination, nextCursor);
+  }
+
+  return moveToPreviousPage(snapshot.pagination, nextCursor);
+}
+
 export function useSearchController(provider: SoundProvider) {
   const [inputQuery, setInputQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
@@ -46,6 +58,18 @@ export function useSearchController(provider: SoundProvider) {
   const requestIdRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const failedRequestRef = useRef<RequestSnapshot | null>(null);
+
+  const resetRequestState = useCallback((nextStatus: SearchStatus, nextActiveQuery = "") => {
+    abortControllerRef.current?.abort();
+    requestIdRef.current += 1;
+    failedRequestRef.current = null;
+    setActiveQuery(nextActiveQuery);
+    setResults([]);
+    setSelectedResult(null);
+    setStatus(nextStatus);
+    setErrorMessage("");
+    setPagination(initialPaginationState);
+  }, []);
 
   const startRequest = useCallback(
     async (snapshot: RequestSnapshot) => {
@@ -75,17 +99,7 @@ export function useSearchController(provider: SoundProvider) {
         setResults(page.results);
         setSelectedResult(null);
         setStatus(page.results.length > 0 ? "success" : "empty");
-        setPagination((currentPagination) => {
-          if (snapshot.kind === "first") {
-            return startPagination(page.nextCursor);
-          }
-
-          if (snapshot.kind === "next") {
-            return moveToNextPage(snapshot.pagination, page.nextCursor);
-          }
-
-          return moveToPreviousPage(snapshot.pagination, page.nextCursor);
-        });
+        setPagination(getPaginationAfterPage(snapshot, page.nextCursor));
         failedRequestRef.current = null;
 
         if (snapshot.kind === "first") {
@@ -114,26 +128,12 @@ export function useSearchController(provider: SoundProvider) {
       const query = cleanSearchTerm(term);
 
       if (!query) {
-        abortControllerRef.current?.abort();
-        requestIdRef.current += 1;
-        setActiveQuery("");
-        setResults([]);
-        setSelectedResult(null);
-        setStatus("idle");
-        setErrorMessage("");
-        setPagination(initialPaginationState);
+        resetRequestState("idle");
         return;
       }
 
       if (!isValidSearchTerm(query)) {
-        abortControllerRef.current?.abort();
-        requestIdRef.current += 1;
-        setActiveQuery(query);
-        setResults([]);
-        setSelectedResult(null);
-        setStatus("tooShort");
-        setErrorMessage("");
-        setPagination(initialPaginationState);
+        resetRequestState("tooShort", query);
         return;
       }
 
@@ -144,7 +144,7 @@ export function useSearchController(provider: SoundProvider) {
         pagination: initialPaginationState
       });
     },
-    [startRequest]
+    [resetRequestState, startRequest]
   );
 
   useEffect(() => {
@@ -211,6 +211,8 @@ export function useSearchController(provider: SoundProvider) {
     };
   }, []);
 
+  const isLoading = status === "loading";
+
   return {
     inputQuery,
     activeQuery,
@@ -220,9 +222,9 @@ export function useSearchController(provider: SoundProvider) {
     errorMessage,
     pagination,
     lastSuccessfulSearch,
-    isLoading: status === "loading",
-    canGoPrevious: status !== "loading" && canGoPrevious(pagination),
-    canGoNext: status !== "loading" && canGoNext(pagination),
+    isLoading,
+    canGoPrevious: !isLoading && canGoPrevious(pagination),
+    canGoNext: !isLoading && canGoNext(pagination),
     setInputQuery,
     submitSearch,
     searchRecentTerm,

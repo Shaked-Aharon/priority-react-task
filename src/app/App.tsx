@@ -18,6 +18,7 @@ const VIEW_MODES = ["list", "tile"] as const;
 
 export function App() {
   const search = useSearchController(mixcloudProvider);
+  const { selectResult } = search;
   const { recentSearches, addSearch } = useRecentSearches();
   const [viewMode, setViewMode] = usePersistentPreference<ViewMode>(
     STORAGE_KEYS.viewMode,
@@ -25,7 +26,8 @@ export function App() {
     VIEW_MODES
   );
   const previewRef = useRef<HTMLDivElement>(null);
-  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [openPlayerResultId, setOpenPlayerResultId] = useState<string | null>(null);
+  const isPlayerOpen = openPlayerResultId === search.selectedResult?.id;
 
   useEffect(() => {
     if (search.lastSuccessfulSearch) {
@@ -35,19 +37,15 @@ export function App() {
 
   const handleSelectResult = useCallback(
     (result: SoundSearchResult, sourceElement: HTMLElement) => {
-      search.selectResult(result);
+      selectResult(result);
 
       if (previewRef.current) {
         animateSelection(sourceElement, previewRef.current);
         window.setTimeout(() => previewRef.current?.focus(), 0);
       }
     },
-    [search]
+    [selectResult]
   );
-
-  useEffect(() => {
-    setIsPlayerOpen(false);
-  }, [search.selectedResult?.id]);
 
   return (
     <main className="app-shell">
@@ -88,7 +86,7 @@ export function App() {
         <ImagePreview
           ref={previewRef}
           result={search.selectedResult}
-          onOpenPlayer={() => setIsPlayerOpen(true)}
+          onOpenPlayer={() => setOpenPlayerResultId(search.selectedResult?.id ?? null)}
         />
         {search.selectedResult && isPlayerOpen ? <PlayerEmbed result={search.selectedResult} /> : null}
       </section>
