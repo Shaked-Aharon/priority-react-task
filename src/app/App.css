@@ -49,6 +49,9 @@
   --space-10: 0.9rem;
   --space-11: 1rem;
   --space-12: 1.35rem;
+  --duration-fast: 140ms;
+  --duration-medium: 220ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   color-scheme: light;
   color: var(--color-text);
   background: var(--color-page);
@@ -224,19 +227,20 @@ button {
   font-weight: var(--font-weight-bold);
   padding: var(--space-6) var(--space-10);
   transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    box-shadow 150ms ease,
-    transform 150ms ease;
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
 }
 
 button:hover:not(:disabled) {
   border-color: var(--color-primary-hover);
   background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 button:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 button:disabled {
@@ -306,11 +310,21 @@ input:focus-visible {
   background: var(--color-surface-solid);
   color: var(--color-text);
   text-align: left;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
 }
 
 .result-card:hover:not(:disabled) {
   border-color: var(--color-border-hover);
   background: var(--color-surface-subtle);
+  transform: translateY(-2px);
+}
+
+.result-card:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .result-card[aria-pressed="true"] {
@@ -364,6 +378,26 @@ input:focus-visible {
 
 .result-card--tile .result-card__text {
   width: 100%;
+}
+
+.result-list__item .result-card:not(.result-card--skeleton),
+.result-grid__item .result-card:not(.result-card--skeleton) {
+  animation: result-enter var(--duration-medium) var(--ease-standard) both;
+}
+
+.result-list__item:nth-child(2) .result-card:not(.result-card--skeleton),
+.result-grid__item:nth-child(2) .result-card:not(.result-card--skeleton) {
+  animation-delay: 24ms;
+}
+
+.result-list__item:nth-child(3) .result-card:not(.result-card--skeleton),
+.result-grid__item:nth-child(3) .result-card:not(.result-card--skeleton) {
+  animation-delay: 48ms;
+}
+
+.result-list__item:nth-child(n + 4) .result-card:not(.result-card--skeleton),
+.result-grid__item:nth-child(n + 4) .result-card:not(.result-card--skeleton) {
+  animation-delay: 72ms;
 }
 
 .result-card--skeleton {
@@ -531,7 +565,7 @@ input:focus-visible {
   position: relative;
   width: 100%;
   height: 100%;
-  animation: preview-fade 220ms ease-out;
+  animation: preview-fade var(--duration-medium) var(--ease-standard);
 }
 
 .image-preview__figure img {
@@ -568,6 +602,7 @@ input:focus-visible {
   border: 1px solid var(--color-border-muted);
   border-radius: var(--radius-lg);
   background: var(--color-surface-solid);
+  animation: player-reveal var(--duration-medium) var(--ease-standard) both;
 }
 
 .player-embed iframe {
@@ -583,12 +618,37 @@ input:focus-visible {
   pointer-events: none;
   transform-origin: center;
   overflow: hidden;
+  box-shadow: var(--shadow-region);
+}
+
+@keyframes result-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes preview-fade {
   from {
     opacity: 0;
     transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes player-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35rem);
   }
 
   to {
@@ -613,6 +673,7 @@ input:focus-visible {
   *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }

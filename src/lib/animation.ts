@@ -1,5 +1,8 @@
+const SELECTION_ANIMATION_MS = 260;
+const SELECTION_EASING = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+
 export function shouldReduceMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 }
 
 export function animateSelection(sourceElement: HTMLElement, targetElement: HTMLElement): void {
@@ -33,8 +36,8 @@ export function animateSelection(sourceElement: HTMLElement, targetElement: HTML
       }
     ],
     {
-      duration: 260,
-      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"
+      duration: SELECTION_ANIMATION_MS,
+      easing: SELECTION_EASING
     }
   );
 
