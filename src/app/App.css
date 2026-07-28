@@ -49,12 +49,87 @@
   --space-10: 0.9rem;
   --space-11: 1rem;
   --space-12: 1.35rem;
+  color-scheme: light;
   color: var(--color-text);
   background: var(--color-page);
   font-family:
     var(--font-family-base);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+:root[data-theme="dark"] {
+  --color-text: #edf7f2;
+  --color-heading: #f6fffb;
+  --color-muted: #a9bbb2;
+  --color-page: #101816;
+  --color-page-scrim-start: rgba(18, 29, 26, 0.94);
+  --color-page-scrim-end: rgba(11, 17, 15, 0.98);
+  --color-surface: rgba(22, 34, 30, 0.96);
+  --color-surface-solid: #17221f;
+  --color-surface-subtle: #1c2b26;
+  --color-surface-muted: #121d1a;
+  --color-control-subtle: #20362f;
+  --color-border: #2b4039;
+  --color-border-strong: #466059;
+  --color-border-muted: #334a42;
+  --color-border-dashed: #405a51;
+  --color-border-control: #405b52;
+  --color-border-hover: #6c9c8a;
+  --color-primary: #83d3b5;
+  --color-primary-hover: #a2e7cf;
+  --color-primary-contrast: #10251e;
+  --color-focus-ring: rgba(238, 172, 108, 0.52);
+  --color-selected-ring: rgba(131, 211, 181, 0.24);
+  --color-preview-ring: rgba(131, 211, 181, 0.32);
+  --color-error-border: #cf8585;
+  --color-error-surface: #2a1b1b;
+  --color-skeleton: #263a33;
+  --color-skeleton-highlight: rgba(255, 255, 255, 0.12);
+  --color-skeleton-transparent: rgba(38, 58, 51, 0);
+  --color-image-caption: rgba(0, 0, 0, 0.78);
+  --color-image-caption-text: #ffffff;
+  --color-image-caption-muted: #d7e7df;
+  --shadow-region: 0 18px 42px rgba(0, 0, 0, 0.34);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    --color-text: #edf7f2;
+    --color-heading: #f6fffb;
+    --color-muted: #a9bbb2;
+    --color-page: #101816;
+    --color-page-scrim-start: rgba(18, 29, 26, 0.94);
+    --color-page-scrim-end: rgba(11, 17, 15, 0.98);
+    --color-surface: rgba(22, 34, 30, 0.96);
+    --color-surface-solid: #17221f;
+    --color-surface-subtle: #1c2b26;
+    --color-surface-muted: #121d1a;
+    --color-control-subtle: #20362f;
+    --color-border: #2b4039;
+    --color-border-strong: #466059;
+    --color-border-muted: #334a42;
+    --color-border-dashed: #405a51;
+    --color-border-control: #405b52;
+    --color-border-hover: #6c9c8a;
+    --color-primary: #83d3b5;
+    --color-primary-hover: #a2e7cf;
+    --color-primary-contrast: #10251e;
+    --color-focus-ring: rgba(238, 172, 108, 0.52);
+    --color-selected-ring: rgba(131, 211, 181, 0.24);
+    --color-preview-ring: rgba(131, 211, 181, 0.32);
+    --color-error-border: #cf8585;
+    --color-error-surface: #2a1b1b;
+    --color-skeleton: #263a33;
+    --color-skeleton-highlight: rgba(255, 255, 255, 0.12);
+    --color-skeleton-transparent: rgba(38, 58, 51, 0);
+    --color-image-caption: rgba(0, 0, 0, 0.78);
+    --color-image-caption-text: #ffffff;
+    --color-image-caption-muted: #d7e7df;
+    --shadow-region: 0 18px 42px rgba(0, 0, 0, 0.34);
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -101,6 +176,13 @@ input {
 .app-region p {
   margin: 0;
   color: var(--color-muted);
+}
+
+.app-region__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-7);
 }
 
 .search-bar {
@@ -333,20 +415,38 @@ input:focus-visible {
   animation: skeleton-shimmer 1.25s ease-in-out infinite;
 }
 
+.theme-controls,
 .view-mode-controls {
   display: flex;
-  justify-content: flex-end;
   gap: var(--space-3);
+}
+
+.theme-controls {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.view-mode-controls {
+  justify-content: flex-end;
   margin-top: var(--space-7);
 }
 
+.theme-controls button,
 .view-mode-controls button {
-  min-width: 4.5rem;
   border-color: var(--color-border-control);
   background: var(--color-control-subtle);
   color: var(--color-primary);
 }
 
+.theme-controls button {
+  min-width: 4.6rem;
+}
+
+.view-mode-controls button {
+  min-width: 4.5rem;
+}
+
+.theme-controls button[aria-pressed="true"],
 .view-mode-controls button[aria-pressed="true"] {
   border-color: var(--color-primary);
   background: var(--color-primary);
@@ -523,6 +623,19 @@ input:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .app-region__header {
+    display: grid;
+  }
+
+  .theme-controls {
+    justify-content: stretch;
+  }
+
+  .theme-controls button {
+    flex: 1;
+    min-width: 0;
+  }
+
   .search-bar__controls,
   .pagination-controls,
   .view-mode-controls {

@@ -7,6 +7,7 @@ import { PlayerEmbed } from "../components/PlayerEmbed";
 import { RecentSearches } from "../components/RecentSearches";
 import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
+import { ThemeControls, type ThemePreference } from "../components/ThemeControls";
 import { ViewModeControls, type ViewMode } from "../components/ViewModeControls";
 import { usePersistentPreference } from "../hooks/usePersistentPreference";
 import { useRecentSearches } from "../hooks/useRecentSearches";
@@ -15,6 +16,7 @@ import { animateSelection } from "../lib/animation";
 import { STORAGE_KEYS } from "../lib/storage";
 
 const VIEW_MODES = ["list", "tile"] as const;
+const THEME_PREFERENCES = ["system", "light", "dark"] as const;
 
 export function App() {
   const search = useSearchController(mixcloudProvider);
@@ -25,6 +27,11 @@ export function App() {
     "list",
     VIEW_MODES
   );
+  const [themePreference, setThemePreference] = usePersistentPreference<ThemePreference>(
+    STORAGE_KEYS.theme,
+    "system",
+    THEME_PREFERENCES
+  );
   const previewRef = useRef<HTMLDivElement>(null);
   const [openPlayerResultId, setOpenPlayerResultId] = useState<string | null>(null);
   const isPlayerOpen = openPlayerResultId === search.selectedResult?.id;
@@ -34,6 +41,10 @@ export function App() {
       addSearch(search.lastSuccessfulSearch.term);
     }
   }, [addSearch, search.lastSuccessfulSearch]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = themePreference;
+  }, [themePreference]);
 
   const handleSelectResult = useCallback(
     (result: SoundSearchResult, sourceElement: HTMLElement) => {
@@ -54,7 +65,10 @@ export function App() {
         aria-labelledby="search-heading"
         aria-busy={search.isLoading}
       >
-        <h1 id="search-heading">Sound Search</h1>
+        <div className="app-region__header">
+          <h1 id="search-heading">Sound Search</h1>
+          <ThemeControls value={themePreference} onChange={setThemePreference} />
+        </div>
         <SearchBar
           value={search.inputQuery}
           isLoading={search.isLoading}
