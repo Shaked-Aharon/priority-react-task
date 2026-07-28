@@ -26,6 +26,18 @@ export const messages = {
       light: "Light",
       dark: "Dark"
     },
+    settings: {
+      trigger: "Settings",
+      title: "Settings",
+      languageLabel: "Language",
+      themeLabel: "Theme",
+      close: "Close",
+      english: "English",
+      hebrew: "Hebrew",
+      system: "System",
+      light: "Light",
+      dark: "Dark"
+    },
     searchBar: {
       label: "Search Mixcloud",
       placeholder: "Try jazz, techno, soul...",
@@ -74,6 +86,18 @@ export const messages = {
     }
   },
   he: {
+    settings: {
+      trigger: "׳”׳’׳“׳¨׳•׳×",
+      title: "׳”׳’׳“׳¨׳•׳×",
+      languageLabel: "׳©׳₪׳”",
+      themeLabel: "׳¢׳¨׳›׳× ׳ ׳•׳©׳",
+      close: "׳¡׳’׳™׳¨׳”",
+      english: "English",
+      hebrew: "׳¢׳‘׳¨׳™׳×",
+      system: "׳׳¢׳¨׳›׳×",
+      light: "׳‘׳”׳™׳¨",
+      dark: "׳›׳”׳”"
+    },
     app: {
       title: "חיפוש סאונד",
       previewHeading: "תצוגת תמונה",

@@ -45,7 +45,7 @@ The UI uses a lightweight message catalog in `src/i18n/messages.ts` for English 
 
 ## Theme
 
-The theme preference persists as `system`, `light`, or `dark`. `useEffectiveTheme` resolves `system` through `matchMedia("(prefers-color-scheme: dark)")`, so the Mixcloud player can receive a concrete light or dark embed URL without refetching existing results.
+Language and theme preferences live in a compact settings popover in the search header and continue to persist through the storage helpers. The popover uses native controls in a non-modal dialog pattern, closes on Escape or outside click, and returns focus to its trigger. The theme preference persists as `system`, `light`, or `dark`. `useEffectiveTheme` resolves `system` through `matchMedia("(prefers-color-scheme: dark)")`, so the Mixcloud player can receive a concrete light or dark embed URL without refetching existing results.
 
 ## Accessibility And Performance
 

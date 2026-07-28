@@ -2,15 +2,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { mixcloudProvider } from "../api/mixcloudProvider";
 import type { SoundSearchResult } from "../api/types";
 import { ImagePreview } from "../components/ImagePreview";
-import { LanguageControls } from "../components/LanguageControls";
 import { PaginationControls } from "../components/PaginationControls";
 import { PlayerEmbed } from "../components/PlayerEmbed";
 import { RecentSearches } from "../components/RecentSearches";
 import { SearchBar } from "../components/SearchBar";
 import { SearchResults } from "../components/SearchResults";
-import { ThemeControls, type ThemePreference } from "../components/ThemeControls";
+import { SettingsPopover } from "../components/SettingsPopover";
 import { ViewModeControls, type ViewMode } from "../components/ViewModeControls";
-import { useEffectiveTheme } from "../hooks/useEffectiveTheme";
+import { useEffectiveTheme, type ThemePreference } from "../hooks/useEffectiveTheme";
 import { usePersistentPreference } from "../hooks/usePersistentPreference";
 import { useRecentSearches } from "../hooks/useRecentSearches";
 import { useSearchController } from "../hooks/useSearchController";
@@ -102,8 +101,13 @@ export function App() {
         <div className="app-region__header">
           <h1 id="search-heading">{t.app.title}</h1>
           <div className="app-preference-controls">
-            <LanguageControls value={language} messages={t.language} onChange={setLanguage} />
-            <ThemeControls value={themePreference} messages={t.theme} onChange={setThemePreference} />
+            <SettingsPopover
+              language={language}
+              themePreference={themePreference}
+              messages={t.settings}
+              onLanguageChange={setLanguage}
+              onThemePreferenceChange={setThemePreference}
+            />
           </div>
         </div>
         <SearchBar
