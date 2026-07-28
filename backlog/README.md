@@ -41,6 +41,9 @@ The backlog is written for a junior developer. Follow the task numbers in order.
 24. `T24` - Dedupe search requests and extract `useSoundSearchRequest`.
 25. `T25` - Build Mixcloud embed URLs from the effective theme.
 26. `T26` - Replace preference button groups with an accessible settings popover.
+27. `T27` - Refresh handoff docs after player and settings updates.
+28. `T28` - Remove unused preference control components.
+29. `T29` - Add app flow and accessibility verification.
 
 ## Stories
 
