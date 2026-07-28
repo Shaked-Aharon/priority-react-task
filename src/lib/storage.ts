@@ -1,5 +1,6 @@
 export const STORAGE_KEYS = {
   recentSearches: "sound-search:recent-searches",
+  language: "sound-search:language",
   theme: "sound-search:theme",
   viewMode: "sound-search:view-mode"
 } as const;

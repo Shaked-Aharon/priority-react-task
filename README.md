@@ -37,7 +37,11 @@ The app requests 6 results per page. Previous and Next use provider cursors inst
 
 ## Persistence
 
-Recent searches are stored as terms only, deduped case-insensitively, moved to the top when reused, and capped at 5. List/tile view mode and the system/light/dark theme preference persist as small string preferences. Storage helpers catch unavailable storage, invalid JSON, and write failures.
+Recent searches are stored as terms only, deduped case-insensitively, moved to the top when reused, and capped at 5. List/tile view mode, language, and the system/light/dark theme preference persist as small string preferences. Storage helpers catch unavailable storage, invalid JSON, and write failures.
+
+## Localization
+
+The UI uses a lightweight message catalog in `src/i18n/messages.ts` for English and Hebrew. The language preference persists, and Hebrew applies `lang="he"` with right-to-left document direction while Mixcloud result titles and artist names stay unchanged.
 
 ## Accessibility And Performance
 

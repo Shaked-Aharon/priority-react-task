@@ -1,5 +1,6 @@
 import type { SoundSearchResult } from "../api/types";
 import type { SearchStatus } from "../hooks/useSearchController";
+import type { Messages } from "../i18n/messages";
 import { MIN_SEARCH_TERM_LENGTH } from "../lib/recentSearches";
 import { ResultListItem } from "./ResultListItem";
 import { ResultTile } from "./ResultTile";
@@ -14,6 +15,7 @@ type SearchResultsProps = {
   selectedResult: SoundSearchResult | null;
   status: SearchStatus;
   errorMessage: string;
+  messages: Messages["results"];
   viewMode: ViewMode;
   onRetry: () => void;
   onSelect: (result: SoundSearchResult, element: HTMLElement) => void;
@@ -25,17 +27,18 @@ export function SearchResults({
   selectedResult,
   status,
   errorMessage,
+  messages,
   viewMode,
   onRetry,
   onSelect
 }: SearchResultsProps) {
-  const label = activeQuery ? `Results for ${activeQuery}` : "Search results";
+  const label = activeQuery ? messages.label(activeQuery) : messages.defaultLabel;
 
   if (status === "idle") {
     return (
       <StateMessage
-        title="Ready when you are"
-        message="Enter a search term to browse Mixcloud cloudcasts."
+        title={messages.idleTitle}
+        message={messages.idleMessage}
       />
     );
   }
@@ -43,30 +46,30 @@ export function SearchResults({
   if (status === "tooShort") {
     return (
       <StateMessage
-        title="Keep typing"
-        message={`Search terms need at least ${MIN_SEARCH_TERM_LENGTH} characters.`}
+        title={messages.tooShortTitle}
+        message={messages.tooShortMessage(MIN_SEARCH_TERM_LENGTH)}
       />
     );
   }
 
   if (status === "loading") {
-    return <SearchResultsSkeleton activeQuery={activeQuery} viewMode={viewMode} />;
+    return <SearchResultsSkeleton activeQuery={activeQuery} messages={messages} viewMode={viewMode} />;
   }
 
   if (status === "error") {
     return (
       <StateMessage
-        title="Search failed"
-        message={errorMessage}
+        title={messages.errorTitle}
+        message={errorMessage || messages.errorMessage}
         tone="error"
-        actionLabel="Retry"
+        actionLabel={messages.retry}
         onAction={onRetry}
       />
     );
   }
 
   if (status === "empty") {
-    return <StateMessage title="No results" message={`No cloudcasts matched "${activeQuery}".`} />;
+    return <StateMessage title={messages.emptyTitle} message={messages.emptyMessage(activeQuery)} />;
   }
 
   const ResultComponent = viewMode === "tile" ? ResultTile : ResultListItem;
@@ -88,9 +91,11 @@ export function SearchResults({
 
 function SearchResultsSkeleton({
   activeQuery,
+  messages,
   viewMode
 }: {
   activeQuery: string;
+  messages: Messages["results"];
   viewMode: ViewMode;
 }) {
   const listClassName = viewMode === "tile" ? "result-grid" : "result-list";
@@ -103,9 +108,9 @@ function SearchResultsSkeleton({
   return (
     <>
       <p className="sr-only" role="status" aria-live="polite">
-        {activeQuery ? `Searching for ${activeQuery}.` : "Searching."}
+        {messages.searching(activeQuery)}
       </p>
-      <ul className={listClassName} aria-label="Loading search results" aria-hidden="true">
+      <ul className={listClassName} aria-label={messages.loadingLabel} aria-hidden="true">
         {Array.from({ length: SKELETON_ITEM_COUNT }, (_, index) => (
           <li className={itemClassName} key={index}>
             <div className={cardClassName}>

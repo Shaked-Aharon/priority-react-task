@@ -185,6 +185,12 @@ input {
   gap: var(--space-7);
 }
 
+.app-preference-controls {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-3);
+}
+
 .search-bar {
   display: grid;
   gap: var(--space-4);
@@ -415,12 +421,14 @@ input:focus-visible {
   animation: skeleton-shimmer 1.25s ease-in-out infinite;
 }
 
+.language-controls,
 .theme-controls,
 .view-mode-controls {
   display: flex;
   gap: var(--space-3);
 }
 
+.language-controls,
 .theme-controls {
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -431,6 +439,7 @@ input:focus-visible {
   margin-top: var(--space-7);
 }
 
+.language-controls button,
 .theme-controls button,
 .view-mode-controls button {
   border-color: var(--color-border-control);
@@ -438,6 +447,7 @@ input:focus-visible {
   color: var(--color-primary);
 }
 
+.language-controls button,
 .theme-controls button {
   min-width: 4.6rem;
 }
@@ -446,6 +456,7 @@ input:focus-visible {
   min-width: 4.5rem;
 }
 
+.language-controls button[aria-pressed="true"],
 .theme-controls button[aria-pressed="true"],
 .view-mode-controls button[aria-pressed="true"] {
   border-color: var(--color-primary);
@@ -627,10 +638,16 @@ input:focus-visible {
     display: grid;
   }
 
+  .app-preference-controls {
+    justify-items: stretch;
+  }
+
+  .language-controls,
   .theme-controls {
     justify-content: stretch;
   }
 
+  .language-controls button,
   .theme-controls button {
     flex: 1;
     min-width: 0;

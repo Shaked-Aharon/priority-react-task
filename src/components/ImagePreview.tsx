@@ -1,13 +1,15 @@
 import { forwardRef } from "react";
 import type { SoundSearchResult } from "../api/types";
+import type { Messages } from "../i18n/messages";
 
 type ImagePreviewProps = {
   result: SoundSearchResult | null;
+  messages: Messages["preview"];
   onOpenPlayer: () => void;
 };
 
 export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(function ImagePreview(
-  { result, onOpenPlayer },
+  { result, messages, onOpenPlayer },
   ref
 ) {
   return (
@@ -16,14 +18,14 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(functi
       ref={ref}
       tabIndex={-1}
       aria-live="polite"
-      aria-label={result ? `Selected result: ${result.title} by ${result.artist}` : "No result selected"}
+      aria-label={result ? messages.selectedLabel(result.title, result.artist) : messages.emptyLabel}
     >
       {result ? (
         <button
           className="image-preview__button"
           type="button"
           onClick={onOpenPlayer}
-          aria-label={`Open player for ${result.title}`}
+          aria-label={messages.openPlayer(result.title)}
         >
           <figure className="image-preview__figure" key={result.id}>
             <img src={result.imageUrl} alt="" />
@@ -35,7 +37,7 @@ export const ImagePreview = forwardRef<HTMLDivElement, ImagePreviewProps>(functi
         </button>
       ) : (
         <div className="image-preview__placeholder">
-          <p>Select a result to preview its artwork.</p>
+          <p>{messages.placeholder}</p>
         </div>
       )}
     </div>

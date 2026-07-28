@@ -1,21 +1,24 @@
+import type { Messages } from "../i18n/messages";
+
 export type ViewMode = "list" | "tile";
 
 type ViewModeControlsProps = {
   value: ViewMode;
   disabled: boolean;
+  messages: Messages["viewMode"];
   onChange: (value: ViewMode) => void;
 };
 
-export function ViewModeControls({ value, disabled, onChange }: ViewModeControlsProps) {
+export function ViewModeControls({ value, disabled, messages, onChange }: ViewModeControlsProps) {
   return (
-    <div className="view-mode-controls" role="group" aria-label="Result view mode">
+    <div className="view-mode-controls" role="group" aria-label={messages.label}>
       <button
         type="button"
         aria-pressed={value === "list"}
         disabled={disabled}
         onClick={() => onChange("list")}
       >
-        List
+        {messages.list}
       </button>
       <button
         type="button"
@@ -23,7 +26,7 @@ export function ViewModeControls({ value, disabled, onChange }: ViewModeControls
         disabled={disabled}
         onClick={() => onChange("tile")}
       >
-        Tile
+        {messages.tile}
       </button>
     </div>
   );

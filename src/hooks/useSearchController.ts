@@ -117,7 +117,7 @@ export function useSearchController(provider: SoundProvider) {
         setResults([]);
         setSelectedResult(null);
         setStatus("error");
-        setErrorMessage(error instanceof Error ? error.message : "Search failed. Please try again.");
+        setErrorMessage(error instanceof Error ? error.message : "");
       }
     },
     [provider]
