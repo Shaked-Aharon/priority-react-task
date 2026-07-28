@@ -38,6 +38,9 @@ The backlog is written for a junior developer. Follow the task numbers in order.
 21. `T21` - Add English and Hebrew localization.
 22. `T22` - Complete a motion polish pass.
 23. `T23` - Review search controller state and render performance.
+24. `T24` - Dedupe search requests and extract `useSoundSearchRequest`.
+25. `T25` - Build Mixcloud embed URLs from the effective theme.
+26. `T26` - Replace preference button groups with an accessible settings popover.
 
 ## Stories
 
@@ -73,6 +76,8 @@ src/
     usePersistentPreference.ts
     useRecentSearches.ts
     useSearchController.ts
+    useSoundSearchRequest.ts
+    useEffectiveTheme.ts
   lib/
     animation.ts
     pagination.ts
