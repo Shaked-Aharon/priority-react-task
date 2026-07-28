@@ -65,6 +65,25 @@ describe("useSearchController", () => {
     });
   });
 
+  it("does not refetch when a recent search matches the current search", async () => {
+    const search = vi.fn().mockResolvedValue(page([track("soul-track")]));
+    const hook = renderSearchController({ search });
+
+    act(() => {
+      hook.current.searchRecentTerm("soul");
+    });
+    await flushPromises();
+
+    act(() => {
+      hook.current.searchRecentTerm("  soul  ");
+    });
+    await flushPromises();
+
+    expect(search).toHaveBeenCalledTimes(1);
+    expect(hook.current.activeQuery).toBe("soul");
+    expect(hook.current.results).toEqual([track("soul-track")]);
+  });
+
   it("does not search for empty or too-short terms", () => {
     const search = vi.fn(async () => page());
     const hook = renderSearchController({ search });

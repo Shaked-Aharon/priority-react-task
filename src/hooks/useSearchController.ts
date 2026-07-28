@@ -77,6 +77,11 @@ export function useSearchController(provider: SoundProvider) {
     pageSize: PAGE_SIZE,
     onSuccess: handleRequestSuccess
   });
+  const currentSearchStateRef = useRef<{ activeQuery: string; status: SearchStatus }>({
+    activeQuery: "",
+    status: "idle"
+  });
+  currentSearchStateRef.current = { activeQuery, status };
 
   const resetRequestState = useCallback(
     (nextStatus: SearchStatus, nextActiveQuery = "") => {
@@ -124,6 +129,17 @@ export function useSearchController(provider: SoundProvider) {
 
       if (!isValidSearchTerm(query)) {
         resetRequestState("tooShort", query);
+        return;
+      }
+
+      const currentSearchState = currentSearchStateRef.current;
+
+      if (
+        query === currentSearchState.activeQuery &&
+        (currentSearchState.status === "success" ||
+          currentSearchState.status === "empty" ||
+          currentSearchState.status === "loading")
+      ) {
         return;
       }
 
